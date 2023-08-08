@@ -1,1 +1,1 @@
-Please read the [external](./external.md) documentation first.
+Please read the [external](examples/external.md) documentation first.

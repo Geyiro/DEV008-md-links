@@ -1,7 +1,8 @@
-// import { parse } from "/Users/geyiro/src/DEV008-md-links/src/api/parse.js"
-
-// export function mdLinksAPI(){
-//   
-// }
-
-// export default mdLinksAPI;
+export const API = {
+  handleDirectory: function (args) {
+    console.log("Soy directorio");
+  },
+  handleFile: function (args) {
+    console.log("Soy file");
+  },
+};
