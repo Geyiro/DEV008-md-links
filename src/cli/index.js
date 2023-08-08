@@ -5,23 +5,25 @@ import { exit } from "node:process";
 import { API } from "../api/index.js";
 
 export const CLI = {
-  pathToAbsolute: function(path){
+  // ...Given path to absolute ...
+  pathToAbsolute: function (path) {
     return nodePath.resolve(path);
   },
-  validPath: function(path) {
+  // ...Verify if its a valid path ...
+  validPath: function (path) {
     return fs.existsSync(path);
   },
+  // ...parsing arguments and validations ...
   parseArgs: function (argv) {
     const args = argv.slice(2);
     const pathInput = args[0];
     const optionInput = args[1].split("--")[1];
 
     const absolutePath = pathToAbsolute(pathInput);
-    
+
     if (!this.validPath(absolutePath)) {
       console.log(
-        chalk.red("path doesnt exist:") +
-          chalk.red.inverse(absolutePath)
+        chalk.red("path doesnt exist:") + chalk.red.inverse(absolutePath)
       );
 
       exit();
