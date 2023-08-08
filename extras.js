@@ -5,9 +5,6 @@ import { URL } from "node:url";
 // ...Turning a path to absolute
 //___________________________...
 
-const pathInputToAbsolute = path.isAbsolute(pathInput)
-  ? pathInput
-  : path.resolve(pathInput);
 // function pathInputToAbsolute(route) {
 //   if (path.isAbsolute(route)) {
 //     return path;

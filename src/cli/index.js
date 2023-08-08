@@ -1,10 +1,14 @@
 import fs from "node:fs";
 import chalk from "chalk";
+import nodePath from "node:path";
 import { exit } from "node:process";
 import { API } from "../api/index.js";
 
 export const CLI = {
-  validPath: function (path) {
+  pathToAbsolute: function(path){
+    return nodePath.resolve(path);
+  },
+  validPath: function(path) {
     return fs.existsSync(path);
   },
   parseArgs: function (argv) {
@@ -12,10 +16,12 @@ export const CLI = {
     const pathInput = args[0];
     const optionInput = args[1].split("--")[1];
 
-    if (!this.validPath(pathInput)) {
+    const absolutePath = pathToAbsolute(pathInput);
+    
+    if (!this.validPath(absolutePath)) {
       console.log(
-        chalk.red("cannot find any file/directory with given path:") +
-          chalk.red.inverse(pathInput)
+        chalk.red("path doesnt exist:") +
+          chalk.red.inverse(absolutePath)
       );
 
       exit();
