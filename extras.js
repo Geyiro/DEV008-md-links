@@ -17,6 +17,7 @@ const links = [...doc.matchAll(linksPattern)].map((captured) => {
   };
 });
 
+// ...if URL is valid//
 function validateUrl(urlString) {
   try {
     new URL(urlString);

@@ -9,6 +9,7 @@ export const API = {
       return path.extname(file.name) === ".md";
     });
   },
+  // ...here we do a lot of things if directory//
   handleDirectory: function (args) {
     console.log(
       chalk.underline("Files from directory:"),
@@ -20,6 +21,9 @@ export const API = {
       return path.extname(file) === ".md";
     });
     filteredMdFiles.forEach((file) => console.log(file));
+    // if(){
+
+    // };
   },
 
   // ...if File proceed to
