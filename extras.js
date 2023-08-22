@@ -17,17 +17,6 @@ const links = [...doc.matchAll(linksPattern)].map((captured) => {
   };
 });
 
-// ...if URL is valid//
-function validateUrl(urlString) {
-  try {
-    new URL(urlString);
-    return true;
-  } catch (e) {
-    console.log(e);
-    return false;
-  }
-}
-
 // // If type is external, use fetch to check if the link returns 200 (OK)
 // // If type is internal, we need to resolve the path using
 
