@@ -1,36 +1,37 @@
 import { CLI } from "./src/cli/index.js";
+import { API } from "./src/api/index.js";
 import { expect, test } from "vitest";
 import nodePath from "node:path";
 import os from "os";
 
 // pathToAbsolute
 test("pathToAbsolute should return an absolute path", () => {
-  expect(CLI.pathToAbsolute("./examples")).toBe(nodePath.resolve("./examples"));
+  expect(API.pathToAbsolute("./examples")).toBe(nodePath.resolve("./examples"));
 });
 
 test("pathToAbsolute returns cwd when nothing", () => {
-  expect(CLI.pathToAbsolute("")).toBe(process.cwd());
+  expect(API.pathToAbsolute("")).toBe(process.cwd());
 });
 
 test("pathToAbsolute returns undefined", () => {
-  expect(CLI.pathToAbsolute()).toBe(undefined);
+  expect(API.pathToAbsolute()).toBe(undefined);
 });
 
 test("pathToAbsolute returns an string", () => {
-  expect(CLI.pathToAbsolute("./examples")).toBeTypeOf("string");
+  expect(API.pathToAbsolute("./examples")).toBeTypeOf("string");
 });
 
 // validPath
 test("validPath returns path if exists", () => {
-  expect(CLI.validPath("./examples")).toBe(true);
+  expect(API.validPath("./examples")).toBe(true);
 });
 
 test("if validPath is false", () => {
-  expect(CLI.validPath("./ex")).toBe(false);
+  expect(API.validPath("./ex")).toBe(false);
 });
 
 test("validPath returns false if undefined", () => {
-  expect(CLI.validPath()).toStrictEqual(false);
+  expect(API.validPath()).toStrictEqual(false);
 });
 
 // test("validPath false consolelogs error", () => {
@@ -38,7 +39,7 @@ test("validPath returns false if undefined", () => {
 // });
 
 test("validPath is boolean", () => {
-  expect(CLI.validPath()).toBeTypeOf("boolean");
+  expect(API.validPath()).toBeTypeOf("boolean");
 });
 
 // paserArgs (parse Arguments)

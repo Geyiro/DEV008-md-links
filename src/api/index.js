@@ -1,9 +1,24 @@
 import fs from "node:fs";
 import chalk from "chalk";
 import nodePath from "node:path";
-import { Console } from "node:console";
 
 export const API = {
+  // ...Verify if its a valid path//
+  validPath: function (path) {
+    const valid = fs.existsSync(path);
+    if (!valid) {
+      console.log(chalk.red("path doesnt exist:") + chalk.red.inverse(path));
+    }
+    return valid;
+  },
+  // ...Given path to absolute//
+  pathToAbsolute: function (path) {
+    try {
+      return nodePath.resolve(path);
+    } catch (error) {
+      console.error(error);
+    }
+  },
   // ...get all markdown files from directory//
   getMarkdownFiles: function (arr) {
     const filteredMdFiles = arr.filter((file) => {
@@ -31,44 +46,58 @@ export const API = {
     }
     return mdFiles;
   },
-  readFile: function (path) {
-    return fs.readFile(path, "utf8", (error, file) => {
-      if (error) {
-        console.log("toy en catch");
-        console.log(error);
-        return;
-      }
-      console.log("toy en then");
-      console.log("Listing all links");
-      const linksPattern =
-        /!?\[([^\]]*)?\]\(((https?:\/\/)?[A-Za-z0-9\:\/\. ]+)(\"(.+)\")?\)/gm;
-      const links = [...file.matchAll(linksPattern)].map((captured) => {
-        const type = captured[3] ? "external" : "internal";
-        const link =
-          type == "external"
-            ? captured[2]
-            : path.resolve(process.cwd(), captured[2]);
+  getLinks: function (file) {
+    const linksPattern =
+      /!?\[([^\]]*)?\]\(((https?:\/\/)?[A-Za-z0-9\:\/\.\_]+)(\"(.+)\")?\)/gm;
 
-        return {
-          text: captured[1],
-          link,
-          valid:
-            type == "external" ? this.validateUrl(link) : fs.existsSync(link),
-          type,
-        };
-      });
-      console.log(links);
+    return [...file.matchAll(linksPattern)].map((captured) => {
+      const type = captured[3] ? "external" : "internal";
+      const location = captured[2];
+
+      return {
+        text: captured[1],
+        type,
+        location,
+      };
     });
   },
-  validateUrl: function (urlString) {
+
+  validateInternalLink: function (link) {
+    const location = nodePath.resolve(process.cwd(), link.location);
+    return new Promise((resolve) => {
+      resolve({ ...link, location, valid: this.validPath(location) });
+    });
+  },
+
+  validateExternalLink: function (link) {
     try {
-      new URL(urlString);
-      return true;
+      const url = new URL(link.location);
+      return fetch(url, { signal: AbortSignal.timeout(2 * 1000) })
+        .then((response) => {
+          return {
+            ...link,
+            valid: response.status >= 200 && response.status < 300,
+            status: response.status,
+          };
+        })
+        .catch((e) => {
+          return new Promise((resolve) => {
+            resolve({ ...link, valid: false, status: e.message });
+          });
+        });
     } catch (e) {
       console.log(e);
-      return false;
+      return new Promise((resolve) => {
+        resolve({ ...link, valid: false, status: "URL invalid" });
+      });
     }
   },
+  validateLink: function (link) {
+    return link.type === "internal"
+      ? this.validateInternalLink(link)
+      : this.validateExternalLink(link);
+  },
+
   // ...if File proceed to
   handleFile: function (args) {
     const pathArg = args.path;
@@ -77,7 +106,25 @@ export const API = {
     if (nodePath.extname(pathArg) != ".md") {
       console.log(chalk.red("Not a Markdown file"));
     } else {
-      this.readFile(pathArg);
+      fs.readFile(pathArg, "utf8", (error, file) => {
+        if (error) {
+          console.log(error);
+          return;
+        }
+
+        const links = this.getLinks(file);
+
+        if (links.length === 0) {
+          console.log("No links :( ");
+          return;
+        }
+
+        const linksValidations = links.map((link) => this.validateLink(link));
+
+        Promise.all(linksValidations).then((results) =>
+          results.forEach((result) => console.log(result))
+        );
+      });
     }
   },
 };
