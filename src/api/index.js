@@ -46,29 +46,42 @@ export const API = {
     }
     return mdFiles;
   },
-  getLinks: function (file) {
-    const linksPattern =
-      /!?\[([^\]]*)?\]\(((https?:\/\/)?[A-Za-z0-9\:\/\.\_]+)(\"(.+)\")?\)/gm;
+  // ...get all URLS in current markdown file//
+  getLinks: function (filePath) {
+    if (nodePath.extname(filePath) != ".md") {
+      console.log(chalk.red("Not a Markdown file"));
+      return;
+    }
 
-    return [...file.matchAll(linksPattern)].map((captured) => {
-      const type = captured[3] ? "external" : "internal";
-      const location = captured[2];
+    fs.readFile(filePath, "utf8", (error, file) => {
+      if (error) {
+        console.log(error);
+        return;
+      }
 
-      return {
-        text: captured[1],
-        type,
-        location,
-      };
+      const linksPattern =
+        /!?\[([^\]]*)?\]\(((https?:\/\/)?[A-Za-z0-9\:\/\.\_]+)(\"(.+)\")?\)/gm;
+
+      return [...file.matchAll(linksPattern)].map((captured) => {
+        const type = captured[3] ? "external" : "internal";
+        const location = captured[2];
+
+        return {
+          text: captured[1],
+          type,
+          location,
+        };
+      });
     });
   },
-
+  // ...resolve and return internal link path//
   validateInternalLink: function (link) {
     const location = nodePath.resolve(process.cwd(), link.location);
     return new Promise((resolve) => {
       resolve({ ...link, location, valid: this.validPath(location) });
     });
   },
-
+  // ...validates external URLS//
   validateExternalLink: function (link) {
     try {
       const url = new URL(link.location);
@@ -96,35 +109,5 @@ export const API = {
     return link.type === "internal"
       ? this.validateInternalLink(link)
       : this.validateExternalLink(link);
-  },
-
-  // ...if File proceed to
-  handleFile: function (args) {
-    const pathArg = args.path;
-    const optionArg = args.option;
-    console.log(pathArg, optionArg);
-    if (nodePath.extname(pathArg) != ".md") {
-      console.log(chalk.red("Not a Markdown file"));
-    } else {
-      fs.readFile(pathArg, "utf8", (error, file) => {
-        if (error) {
-          console.log(error);
-          return;
-        }
-
-        const links = this.getLinks(file);
-
-        if (links.length === 0) {
-          console.log("No links :( ");
-          return;
-        }
-
-        const linksValidations = links.map((link) => this.validateLink(link));
-
-        Promise.all(linksValidations).then((results) =>
-          results.forEach((result) => console.log(result))
-        );
-      });
-    }
   },
 };

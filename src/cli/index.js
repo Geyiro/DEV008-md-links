@@ -2,7 +2,7 @@ import fs from "node:fs";
 import chalk from "chalk";
 import { exit } from "node:process";
 import { API } from "../api/index.js";
-
+import { mdLinks } from "../api/mdlinks.js";
 
 export const CLI = {
   // ...parsing and validating arguments//
@@ -17,36 +17,23 @@ export const CLI = {
       throw new Error(chalk.red("Multiple paths present, only one needed"));
     }
 
-    if (options != '--validate'){
-      throw new Error(chalk.red("Not a valid option"));
-    }
-    const pathInput = paths[0];    
-    const absolutePath = API.pathToAbsolute(pathInput);
-    API.validPath(absolutePath);
-
-    return { path: absolutePath, option: options[0] };
-  },
-  // ...Uses the API functions to handle if Directory or File//
-  handleArgs: function (args) {
-    fs.stat(args.path, (error, stats) => {
-      if (error) {
-        console.error(error);
-        exit();
-      }
-
-      if (stats.isDirectory()) {
-        API.handleDirectory(args);
-      }
-
-      if (stats.isFile()) {
-        API.handleFile(args);
-      }
-    });
+    return { path: paths[0], options };
   },
 
   // ...Function that starts de CLI in index.js//
   start: function () {
     const args = this.parseArgs(process.argv);
-    this.handleArgs(args);
+    const stats = args.options.includes("--stats");
+    const validate = args.options.includes("--validate");
+
+    mdLinks(args.path).then((links) => {
+      if (validate && !stats) {
+        console.log("estoy en validate");
+      } else if (stats && !validate) {
+        console.log("estoy en stats");
+      } else if ((stats && validate) || (validate && stats)) {
+        console.log("estoy en stats + valid");
+      }
+    });
   },
 };
