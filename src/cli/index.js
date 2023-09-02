@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import chalk from "chalk";
-import { exit } from "node:process";
 import { API } from "../api/index.js";
 import { mdLinks } from "../api/mdlinks.js";
 
@@ -25,15 +24,21 @@ export const CLI = {
     const args = this.parseArgs(process.argv);
     const stats = args.options.includes("--stats");
     const validate = args.options.includes("--validate");
-
-    mdLinks(args.path).then((links) => {
-      if (validate && !stats) {
+    // mdLinks(args.path).then((links) => {
+    if (validate && !stats) {
+      mdLinks(args.path).then((links) => {
         console.log("estoy en validate");
-      } else if (stats && !validate) {
-        console.log("estoy en stats");
-      } else if ((stats && validate) || (validate && stats)) {
-        console.log("estoy en stats + valid");
-      }
-    });
+        // const linksValidations = links.map((link) => API.validateLink(link));
+        links.forEach((link) => console.log(link));
+        // Promise.all(linksValidations).then((results) =>
+        //   results.forEach((result) => console.log(result))
+        // );
+      });
+    } else if (stats && !validate) {
+      console.log("estoy en stats");
+    } else if ((stats && validate) || (validate && stats)) {
+      console.log("estoy en stats + valid");
+    }
+    // });
   },
 };

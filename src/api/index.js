@@ -2,6 +2,9 @@ import fs from "node:fs";
 import chalk from "chalk";
 import nodePath from "node:path";
 
+const linksPattern =
+  /!?\[([^\]]*)?\]\(((https?:\/\/)?[A-Za-z0-9\:\/\.\_]+)(\"(.+)\")?\)/gm;
+
 export const API = {
   // ...Verify if its a valid path//
   validPath: function (path) {
@@ -19,58 +22,47 @@ export const API = {
       console.error(error);
     }
   },
-  // ...get all markdown files from directory//
-  getMarkdownFiles: function (arr) {
-    const filteredMdFiles = arr.filter((file) => {
-      nodePath.extname(file) === ".md";
-    });
-    if (filteredMdFiles.length === 0) {
-      return false;
-    }
-    return filteredMdFiles.forEach((file) => console.log(file));
-  },
+
   // ...here we do a lot of things if directory//
-  handleDirectory: function (args) {
+  handleDirectory: function (directoryPath) {
     console.log(
       chalk.underline("Files from directory:"),
-      chalk.bgYellow.bold(args.path)
+      chalk.bgYellow.bold(directoryPath)
     );
 
-    const dirContents = fs.readdirSync(args.path);
-    const mdFiles = this.getMarkdownFiles(dirContents);
-
-    if (mdFiles === false) {
-      console.log(
-        chalk.red("Cant find any Markdown files in current directory")
-      );
-    }
-    return mdFiles;
+    const filesInDir = fs.readdirSync(directoryPath);
+    return filesInDir.filter((file) => nodePath.extname(file) === ".md");
   },
   // ...get all URLS in current markdown file//
+  // Given a filePath, getLinks returns Promise<Link[]>.
+  // If the file extension is not a .md, it returns null instead.
   getLinks: function (filePath) {
     if (nodePath.extname(filePath) != ".md") {
       console.log(chalk.red("Not a Markdown file"));
-      return;
+      return null;
     }
 
-    fs.readFile(filePath, "utf8", (error, file) => {
-      if (error) {
-        console.log(error);
-        return;
-      }
+    return new Promise((resolve, reject) => {
+      fs.readFile(filePath, "utf8", (error, file) => {
+        if (error) {
+          console.log(error);
+          reject(error);
+        }
 
-      const linksPattern =
-        /!?\[([^\]]*)?\]\(((https?:\/\/)?[A-Za-z0-9\:\/\.\_]+)(\"(.+)\")?\)/gm;
+        const linksFound = file.matchAll(linksPattern);
 
-      return [...file.matchAll(linksPattern)].map((captured) => {
-        const type = captured[3] ? "external" : "internal";
-        const location = captured[2];
+        resolve(
+          [...linksFound].map((captured) => {
+            const type = captured[3] ? "external" : "internal";
+            const location = captured[2];
 
-        return {
-          text: captured[1],
-          type,
-          location,
-        };
+            return {
+              text: captured[1],
+              type,
+              location,
+            };
+          })
+        );
       });
     });
   },
