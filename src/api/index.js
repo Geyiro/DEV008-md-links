@@ -102,4 +102,19 @@ export const API = {
       ? this.validateInternalLink(link)
       : this.validateExternalLink(link);
   },
+  uniqueStats: function (links) {
+    const uniqueLinks = [...new Set(links.map((link) => link.href))];
+    return uniqueLinks.length;
+  },
+  brokenLinks: function (links) {
+    let validationPromises = links.map((link) => this.validateLink(link));
+
+    return Promise.all(validationPromises).then((validatedLinks) => {
+      const invalidLinks = validatedLinks.filter(
+        (validatedLink) => validatedLink.valid === false
+      );
+
+      return invalidLinks.length;
+    });
+  },
 };

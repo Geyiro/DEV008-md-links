@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import fs, { link } from "node:fs";
 import chalk from "chalk";
 import { API } from "../api/index.js";
 import { mdLinks } from "../api/mdlinks.js";
@@ -27,17 +27,29 @@ export const CLI = {
     // mdLinks(args.path).then((links) => {
     if (validate && !stats) {
       mdLinks(args.path).then((links) => {
-        console.log("estoy en validate");
-        // const linksValidations = links.map((link) => API.validateLink(link));
-        links.forEach((link) => console.log(link));
-        // Promise.all(linksValidations).then((results) =>
-        //   results.forEach((result) => console.log(result))
-        // );
+        links.forEach((link) => {
+          API.validateLink(link)
+            .then((validLink) => console.log(validLink))
+            .catch((error) => console.error(error));
+        });
       });
     } else if (stats && !validate) {
-      console.log("estoy en stats");
+      mdLinks(args.path).then((links) => {
+        console.log(`\n${"Total :"} ${links.length}`);
+        console.log(`${"Unique :"} ${API.uniqueStats(links)}`);
+        // .catch((error) => console.error(error));
+      });
     } else if ((stats && validate) || (validate && stats)) {
-      console.log("estoy en stats + valid");
+      mdLinks(args.path).then((links) => {
+        console.log(`\n${"Total :"} ${links.length}`);
+        console.log(`${"Unique :"} ${API.uniqueStats(links)}`);
+
+        API.brokenLinks(links).then((brokenCount) =>
+          console.log(`${"Broken :"} ${brokenCount}`)
+        );
+
+        // .catch((error) => console.error(error));
+      });
     }
     // });
   },
