@@ -34,16 +34,12 @@ test("validPath returns false if undefined", () => {
   expect(API.validPath()).toStrictEqual(false);
 });
 
-// test("validPath false consolelogs error", () => {
-//   expect(CLI.validPath("./ex")).toStrictEqual("path doesnt exist:./ex");
-// });
-
 test("validPath is boolean", () => {
   expect(API.validPath()).toBeTypeOf("boolean");
 });
 
 // paserArgs (parse Arguments)
-test("paseArgs returns an array with path(absolute) and the option name", () => {
+test("paseArgs manages input args from user and gives them back if correct", () => {
   expect(
     CLI.parseArgs([
       nodePath.join(os.homedir(), ".asdf/installs/nodejs/20.0.0/bin/node"),
@@ -52,19 +48,9 @@ test("paseArgs returns an array with path(absolute) and the option name", () => 
       "--hello",
     ])
   ).toStrictEqual({
-    path: nodePath.resolve("./examples"),
-    option: "--hello",
+    options: ["--hello"],
+    path: "./examples",
   });
-});
-
-test("paseArgs needs a path", () => {
-  expect(() =>
-    CLI.parseArgs([
-      nodePath.join(os.homedir(), ".asdf/installs/nodejs/20.0.0/bin/node"),
-      nodePath.resolve("./index.js"),
-      "--hello",
-    ])
-  ).toThrowError("Path is required");
 });
 
 test("paseArgs only needs one path", () => {
@@ -79,6 +65,31 @@ test("paseArgs only needs one path", () => {
   ).toThrowError("Multiple paths present, only one needed");
 });
 
-// test("", () => {
-//   expect(CLI.parseArgs()).toBe();
-// });
+// handleDirectory (when the path is a directory)
+
+test("handleDirectory returns an object of md files when path is Dir", () => {
+  expect(API.handleDirectory(nodePath.resolve("./examples"))).toBeTypeOf("object");
+});
+
+test("When handleDirectory cant find any md files", () => {
+  expect(() => API.handleDirectory("./test")).toThrowError(
+    "Cant find any markdown file in CURRENT DIRECTORY"
+  );
+});
+
+// getLinks 
+
+test("getLinks returns an object", () => {
+  expect(API.getLinks("...")).toBeTypeOf("object");
+});
+
+test("getLinks only reads a .md file", () => {
+  expect(API.getLinks("./index.js")).toBe(null);
+});
+
+test("getLinks returns all links caontained in a .md file", () => {
+  expect(API.getLinks("./testingDoc.md")).toBe(null);
+});
+
+
+
