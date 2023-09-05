@@ -1,4 +1,3 @@
-import { URL } from "node:url";
 
 console.log("Listing all links");
 const linksPattern =

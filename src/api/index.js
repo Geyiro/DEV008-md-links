@@ -26,12 +26,23 @@ export const API = {
   // ...here we do a lot of things if directory//
   handleDirectory: function (directoryPath) {
     console.log(
-      chalk.underline("Files from directory:"),
+      chalk.blue.bold(`\n${"LINKS FROM DIRECTORY :"}`),
       chalk.bgYellow.bold(directoryPath)
     );
 
     const filesInDir = fs.readdirSync(directoryPath);
-    return filesInDir.filter((file) => nodePath.extname(file) === ".md");
+    const filtered = filesInDir.filter(
+      (file) => nodePath.extname(file) === ".md"
+    );
+
+    if (filtered.length === 0) {
+      throw TypeError(
+        chalk.red("Cant find any markdown file in CURRENT DIRECTORY")
+      );
+    }
+    console.log(filtered);
+
+    return filtered;
   },
   // ...get all URLS in current markdown file//
   // Given a filePath, getLinks returns Promise<Link[]>.

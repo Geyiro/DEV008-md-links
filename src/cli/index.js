@@ -17,21 +17,21 @@ export const CLI = {
                         ║      Lets get started with Md-Links     ║
                         ╚═════════════════════════════════════════╝
       `)
-      );
-      console.log(
-        chalk.blueBright(
-          `
+      ),
+        console.log(
+          chalk.blueBright(
+            `
       ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
       ┃                                                                                ┃
-      ┃           First you gotta input the path thats going to be analized            ┃
+      ┃          First you gotta input the path that is going to be analized           ┃
       ┃                                                                                ┃
       ┃                      ` +
-            "➥ Md-Links" +
-            "   " +
-            chalk.bgBlue.bold("./path") +
-            "   " +
-            chalk.bgCyan.bold("--option") +
-            `                            ┃
+              "➥ Md-Links" +
+              "   " +
+              chalk.bgBlue.bold("./path") +
+              "   " +
+              chalk.bgCyan.bold("--option") +
+              `                            ┃
       ┃                                                                                ┃
       ┃     for options:                                                               ┃
       ┃  --validate: If you want to check each individual link status                  ┃
@@ -39,8 +39,8 @@ export const CLI = {
       ┃  --stats --validate: Returns how many broken links are + general statistics    ┃
       ┃                                                                                ┃
       ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛`
-        )
-      );
+          )
+        );
     } else if (paths.length > 1) {
       throw new Error(chalk.red("Multiple paths present, only one needed"));
     }
@@ -53,26 +53,23 @@ export const CLI = {
     const args = this.parseArgs(process.argv);
     const stats = args.options.includes("--stats");
     const validate = args.options.includes("--validate");
-    // mdLinks(args.path).then((links) => {
-    if (validate && !stats) {
-      mdLinks(args.path).then((links) => {
+    mdLinks(args.path).then(({ links, isDirectory }) => {
+      if (isDirectory) {
+        return;
+      }
+
+      if (validate && !stats) {
         links.forEach((link) => {
           API.validateLink(link)
             .then((validLink) => console.log(validLink))
             .catch((error) => console.error(error));
         });
-      });
-    } else if (stats && !validate) {
-      mdLinks(args.path)
-        .then((links) => {
-          console.log(chalk.blue.bold(`\n${"TOTAL :"}`) + ` ${links.length}`);
-          console.log(
-            chalk.blue.bold(`${"UNIQUE :"}`) + ` ${API.uniqueStats(links)}`
-          );
-        })
-        .catch((error) => console.error(error));
-    } else if ((stats && validate) || (validate && stats)) {
-      mdLinks(args.path).then((links) => {
+      } else if (stats && !validate) {
+        console.log(chalk.blue.bold(`\n${"TOTAL :"}`) + ` ${links.length}`);
+        console.log(
+          chalk.blue.bold(`${"UNIQUE :"}`) + ` ${API.uniqueStats(links)}`
+        );
+      } else if ((stats && validate) || (validate && stats)) {
         console.log(chalk.blue.bold(`\n${"TOTAL :"}`) + ` ${links.length}`);
         console.log(
           chalk.blue.bold(`${"UNIQUE :"}`) + ` ${API.uniqueStats(links)}`
@@ -85,8 +82,8 @@ export const CLI = {
             )
           )
           .catch((error) => console.error(error));
-      });
-    }
+      }
+    });
     // });
   },
 };

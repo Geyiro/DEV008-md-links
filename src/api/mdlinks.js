@@ -15,10 +15,13 @@ export const mdLinks = (path) =>
         reject(error);
       }
       if (stats.isDirectory()) {
-        resolve(API.handleDirectory(absolutePath));
+        resolve({
+          links: API.handleDirectory(absolutePath),
+          isDirectory: true,
+        });
       }
       if (stats.isFile()) {
-        resolve(API.getLinks(absolutePath));
+        resolve({ links: API.getLinks(absolutePath), isDirectory: false });
       }
     });
   });
