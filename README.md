@@ -1,14 +1,9 @@
 # Markdown Links
 
-  
-- [Markdown Links](#markdown-links)
-  - [1. Prologue](#1-prologue)
-  - [2. MdLinks Script](#2-mdlinks-script)
-  - [3. Flow Chart](#3-flow-chart)
 
 ## 1. Prologue
 
-[Markdown](https://en.wikipedia.org/wiki/Markdown) is a lightweight markup language that is very popular among developers. It is used on many platforms that handle plain text (GitHub, forums, blogs, etc.) and it is very common to find several files in this format in any type of repository (starting with the traditional `README.md`).
+Markdown is a lightweight markup language that is very popular among developers. It is used on many platforms that handle plain text (GitHub, forums, blogs, etc.) and it is very common to find several files in this format in any type of repository (starting with the traditional `README.md`).
 
 These `Markdown` files typically contain _links_ that are often broken or no longer valid, greatly diminishing the value of the information being shared.
 
@@ -28,3 +23,19 @@ API (mdlinks) flow chart:
 
   ![./Assets/Diagrama de Flujo MD-LINKS (1).png](https://github.com/Geyiro/DEV008-md-links/blob/main/Assets/MDLINKS.png)
 
+
+## 4. How to use
+
+After downloading the package, you will need to enter `index.js` followed by the path of the file desired to be analysed and the option(s).
+
+![screenshot of welcome message](https://github.com/Geyiro/DEV008-md-links/blob/main/Assets/welcomeCLI.png)
+
+With `index.js` `./markdown/file/path` `--validate` you will get the _text_, _type_(internal or external), _location_(URL), _valid_(can be true or false) and the HTTP response for each link within the file.
+
+![screenshot of --validate](https://github.com/Geyiro/DEV008-md-links/blob/main/Assets/validate_output.png)
+
+With `index.js` `./markdown/file/path` `--stats` you will get the total _number of links_ and the total _number of unique links_.
+
+![screenshot of --stats](https://github.com/Geyiro/DEV008-md-links/blob/main/Assets/stats_output.png)
+
+Also you can input `index.js` `./markdown/file/path` `--stats` `--validate` (or viceversa) to get the total _number of links_, the total _number of unique links_ and the total _number of broken links_.
