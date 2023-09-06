@@ -26,7 +26,7 @@ export const API = {
   // ...here we do a lot of things if directory//
   handleDirectory: function (directoryPath) {
     console.log(
-      chalk.blue.bold(`\n${"LINKS FROM DIRECTORY :"}`),
+      chalk.blue.bold(`\n${"FILES FROM DIRECTORY :"}`),
       chalk.bgYellow.bold(directoryPath)
     );
 
@@ -40,7 +40,6 @@ export const API = {
         chalk.red("Cant find any markdown file in CURRENT DIRECTORY")
       );
     }
-    console.log(filtered);
 
     return filtered;
   },
@@ -49,7 +48,7 @@ export const API = {
   // If the file extension is not a .md, it returns null instead.
   getLinks: function (filePath) {
     if (nodePath.extname(filePath) != ".md") {
-      console.log(chalk.red("Not a Markdown file"));
+      console.log(chalk.red("Not a markdown file"));
       return null;
     }
 

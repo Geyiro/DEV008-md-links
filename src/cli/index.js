@@ -10,7 +10,7 @@ export const CLI = {
     const paths = args.filter((arg) => !options.includes(arg));
 
     if (paths.length < 1) {
-      console.log(
+      return console.log(
         chalk.blue.bold(`
       
                         ╔═════════════════════════════════════════╗
@@ -53,36 +53,43 @@ export const CLI = {
     const args = this.parseArgs(process.argv);
     const stats = args.options.includes("--stats");
     const validate = args.options.includes("--validate");
-    mdLinks(args.path).then(({ links, isDirectory }) => {
+    mdLinks(args.path).then(({ result, isDirectory }) => {
+      if (!result) {
+        return;
+      }
+  
       if (isDirectory) {
+        console.log(result);
         return;
       }
 
-      if (validate && !stats) {
-        links.forEach((link) => {
-          API.validateLink(link)
-            .then((validLink) => console.log(validLink))
-            .catch((error) => console.error(error));
-        });
-      } else if (stats && !validate) {
-        console.log(chalk.blue.bold(`\n${"TOTAL :"}`) + ` ${links.length}`);
-        console.log(
-          chalk.blue.bold(`${"UNIQUE :"}`) + ` ${API.uniqueStats(links)}`
-        );
-      } else if ((stats && validate) || (validate && stats)) {
-        console.log(chalk.blue.bold(`\n${"TOTAL :"}`) + ` ${links.length}`);
-        console.log(
-          chalk.blue.bold(`${"UNIQUE :"}`) + ` ${API.uniqueStats(links)}`
-        );
+      result.then((links) => {
+        if (validate && !stats) {
+          links.forEach((link) => {
+            API.validateLink(link)
+              .then((validLink) => console.log(validLink))
+              .catch((error) => console.error(error));
+          });
+        } else if (stats && !validate) {
+          console.log(chalk.blue.bold(`\n${"TOTAL :"}`) + ` ${links.length}`);
+          console.log(
+            chalk.blue.bold(`${"UNIQUE :"}`) + ` ${API.uniqueStats(links)}`
+          );
+        } else if ((stats && validate) || (validate && stats)) {
+          console.log(chalk.blue.bold(`\n${"TOTAL :"}`) + ` ${links.length}`);
+          console.log(
+            chalk.blue.bold(`${"UNIQUE :"}`) + ` ${API.uniqueStats(links)}`
+          );
 
-        API.brokenLinks(links)
-          .then((brokenCount) =>
-            console.log(
-              chalk.red.bold(`${"BROKEN :"}`) + chalk.red(` ${brokenCount}`)
+          API.brokenLinks(links)
+            .then((brokenCount) =>
+              console.log(
+                chalk.red.bold(`${"BROKEN :"}`) + chalk.red(` ${brokenCount}`)
+              )
             )
-          )
-          .catch((error) => console.error(error));
-      }
+            .catch((error) => console.error(error));
+        }
+      });
     });
     // });
   },

@@ -16,12 +16,12 @@ export const mdLinks = (path) =>
       }
       if (stats.isDirectory()) {
         resolve({
-          links: API.handleDirectory(absolutePath),
+          result: API.handleDirectory(absolutePath),
           isDirectory: true,
         });
       }
       if (stats.isFile()) {
-        resolve({ links: API.getLinks(absolutePath), isDirectory: false });
+        resolve({ result: API.getLinks(absolutePath), isDirectory: false });
       }
     });
   });
