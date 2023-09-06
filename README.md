@@ -39,3 +39,5 @@ With `index.js` `./markdown/file/path` `--stats` you will get the total _number 
 ![screenshot of --stats](https://github.com/Geyiro/DEV008-md-links/blob/main/Assets/stats_output.png)
 
 Also you can input `index.js` `./markdown/file/path` `--stats` `--validate` (or viceversa) to get the total _number of links_, the total _number of unique links_ and the total _number of broken links_.
+
+![screenshot of --stats & --validate](https://github.com/Geyiro/DEV008-md-links/blob/main/Assets/statsvalidate_output.png)
